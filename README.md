@@ -2,6 +2,10 @@
 
 Misomia is a Flutter app featuring an AI avatar that visually expresses emotions. It analyzes chat messages via Gemini API, generating anime-style faces with Hugging Face AI. Securely proxies all API keys via Google Cloud Functions, ensuring client-side security. Experience dynamic, empathetic visual and text interaction.
 
+## Live Demo
+
+[Access the Misomia Web App here!](https://yuji-hamada.github.io/misomia/)
+
 ## Features
 
 *   **Human-Centered AI Avatar:** An AI character that responds visually and textually.
@@ -47,10 +51,6 @@ Type your messages in the chat input. The avatar will detect your emotion, gener
   <img src="docs/images/sad_avatar.png" width="300" alt="Sad Avatar Example" style="display: inline-block; margin: 0 10px;">
   <img src="docs/images/app_screenshot.png" width="300" alt="App Screenshot" style="display: inline-block; margin: 0 10px;">
 </p>
-
-*A sample image of the avatar expressing happiness.*
-*A sample image of the avatar expressing sadness.*
-*A screenshot of the Misomia app interface.*
 
 ---
 
