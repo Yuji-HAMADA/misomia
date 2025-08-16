@@ -94,8 +94,10 @@ class _ChatScreenState extends State<ChatScreen> {
         child: SingleChildScrollView( // Wrapped with SingleChildScrollView
           child: Column(
             children: [
+              // Fixed AvatarView at the top
               AvatarView(emotion: lastEmotion, imagePrompt: _imagePromptController.text.isEmpty ? null : _imagePromptController.text),
               const SizedBox(height: 20),
+              // Fixed image prompt TextField
               TextField(
                 controller: _imagePromptController,
                 decoration: const InputDecoration(
@@ -182,6 +184,7 @@ class _AvatarViewState extends State<AvatarView> {
     setState(() {
       _isLoadingImage = true;
       _imageData = null; // Clear previous image
+    
     });
 
     final imageData = await _imageGenerationService.generateAnimeImage(emotion, imagePrompt);
