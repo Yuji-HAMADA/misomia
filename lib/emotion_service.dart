@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:math';
+import 'package:flutter/foundation.dart'; // For debugPrint
 
 enum Emotion {
   neutral,
@@ -15,7 +15,7 @@ class EmotionService {
 
   Future<Emotion> getEmotion(String text) async {
     // Mock implementation is active by default.
-//    return await _getMockEmotion(text);
+//    return await _getMockEmotion(text); // Removed _getMockEmotion method
 
     final url = Uri.parse('https://us-central1-misomia.cloudfunctions.net/getGeminiEmotion');
 
@@ -31,11 +31,11 @@ class EmotionService {
         final String label = data['emotion'].toString().trim().toLowerCase();
         return _mapLabelToEmotion(label);
       } else {
-        print('Cloud Function Error (Emotion): ${response.statusCode} ${response.body}');
+        debugPrint('Cloud Function Error (Emotion): ${response.statusCode} ${response.body}'); // Changed from print to debugPrint
         return Emotion.neutral;
       }
     } catch (e) {
-      print('Exception during Cloud Function call (Emotion): $e');
+      debugPrint('Exception during Cloud Function call (Emotion): $e'); // Changed from print to debugPrint
       return Emotion.neutral;
     }
   }
@@ -54,11 +54,5 @@ class EmotionService {
       default:
         return Emotion.neutral;
     }
-  }
-
-  Future<Emotion> _getMockEmotion(String text) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final emotions = Emotion.values;
-    return emotions[text.length % emotions.length];
   }
 }

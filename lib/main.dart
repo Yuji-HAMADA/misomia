@@ -89,6 +89,7 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: const Text('Misomia'),
       ),
+      drawer: ImagePromptDrawer(controller: _imagePromptController), // Added Drawer
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView( // Wrapped with SingleChildScrollView
@@ -96,15 +97,6 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               // Fixed AvatarView at the top
               AvatarView(emotion: lastEmotion, imagePrompt: _imagePromptController.text.isEmpty ? null : _imagePromptController.text),
-              const SizedBox(height: 20),
-              // Fixed image prompt TextField
-              TextField(
-                controller: _imagePromptController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter image prompt (e.g., "anime girl with blue hair")',
-                  border: OutlineInputBorder(),
-                ),
-              ),
               const SizedBox(height: 20),
               ListView.builder(
                 shrinkWrap: true,
@@ -146,6 +138,46 @@ class _ChatScreenState extends State<ChatScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ImagePromptDrawer extends StatelessWidget {
+  final TextEditingController controller;
+
+  const ImagePromptDrawer({super.key, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.deepPurple,
+            ),
+            child: Text(
+              'Image Prompt',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'Enter image prompt (e.g., "anime girl with blue hair")',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ),
+        ],
       ),
     );
   }

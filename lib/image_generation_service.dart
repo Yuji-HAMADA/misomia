@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:misomia/emotion_service.dart';
+import 'package:flutter/foundation.dart'; // For debugPrint
 
 class ImageGenerationService {
   // No API key needed here, as it's handled by the Cloud Function.
@@ -33,11 +33,11 @@ class ImageGenerationService {
         final String base64Image = data['image'];
         return base64Decode(base64Image);
       } else {
-        print('Cloud Function Error (Image): ${response.statusCode} ${response.body}');
+        debugPrint('Cloud Function Error (Image): ${response.statusCode} ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Exception during Cloud Function call (Image): $e');
+      debugPrint('Exception during Cloud Function call (Image): $e');
       return null;
     }
   }

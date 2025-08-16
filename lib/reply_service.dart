@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:misomia/emotion_service.dart';
+import 'package:flutter/foundation.dart'; // For debugPrint
 
 class ReplyService {
   // No API key needed here, as it's handled by the Cloud Function.
 
   Future<String> getReply(Emotion emotion, String userMessage) async {
-    // Rule-based mock is active by default.
-//    return _getRuleBasedReply(emotion);
 
     final url = Uri.parse('https://us-central1-misomia.cloudfunctions.net/getGeminiReply');
 
@@ -23,12 +22,12 @@ class ReplyService {
         final data = jsonDecode(response.body);
         return data['reply'].toString().trim();
       } else {
-        print('Cloud Function Error (Reply): ${response.statusCode} ${response.body}');
+        debugPrint('Cloud Function Error (Reply): ${response.statusCode} ${response.body}');
         return _getRuleBasedReply(emotion);
       }
     } catch (e) {
-      print('Exception during Cloud Function call (Reply): $e');
-      return _getRuleBasedReply(emotion);
+      debugPrint('Exception during Cloud Function call (Reply): $e');
+        return _getRuleBasedReply(emotion);
     }
   }
 
@@ -45,4 +44,3 @@ class ReplyService {
     Emotion.neutral: ["I see.", "Got it."],
   };
 }
-
