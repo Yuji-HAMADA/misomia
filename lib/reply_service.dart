@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
-import 'emotion_service.dart';
+import 'package:misomia/emotion_service.dart';
 
 class ReplyService {
   // No API key needed here, as it's handled by the Cloud Function.

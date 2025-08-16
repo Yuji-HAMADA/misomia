@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:typed_data'; // For Uint8List
-import 'emotion_service.dart';
-import 'reply_service.dart';
-import 'image_generation_service.dart'; // New import
+import 'package:misomia/emotion_service.dart';
+import 'package:misomia/reply_service.dart';
+import 'package:misomia/image_generation_service.dart'; // New import
+import 'package:flutter/foundation.dart'; // For debugPrint
 
 void main() {
   runApp(const MisomiaApp());
@@ -72,7 +72,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ));
       });
     } catch (e) {
-      print('Error processing message: $e');
+      debugPrint('Error processing message: $e'); // Changed from print to debugPrint
     } finally {
       setState(() {
         _isLoading = false;
