@@ -42,16 +42,14 @@ Type your messages in the chat input. The avatar will detect your emotion, gener
 
 ## Sample Images
 
-Here are some examples of the generated avatars and the app in action:
+<p align="center">
+  <img src="docs/images/happy_avatar.png" width="300" alt="Happy Avatar Example" style="display: inline-block; margin: 0 10px;">
+  <img src="docs/images/sad_avatar.png" width="300" alt="Sad Avatar Example" style="display: inline-block; margin: 0 10px;">
+  <img src="docs/images/app_screenshot.png" width="300" alt="App Screenshot" style="display: inline-block; margin: 0 10px;">
+</p>
 
-<!-- Replace these with paths to your actual images -->
-![Happy Avatar Example](docs/images/happy_avatar.png)
 *A sample image of the avatar expressing happiness.*
-
-![Sad Avatar Example](docs/images/sad_avatar.png)
 *A sample image of the avatar expressing sadness.*
-
-![App Screenshot](docs/images/app_screenshot.png)
 *A screenshot of the Misomia app interface.*
 
 ---
