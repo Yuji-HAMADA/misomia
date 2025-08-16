@@ -48,10 +48,6 @@ Type your messages in the chat input. The avatar will detect your emotion, gener
   <img src="docs/images/app_screenshot.png" width="300" alt="App Screenshot" style="display: inline-block; margin: 0 10px;">
 </p>
 
-*A sample image of the avatar expressing happiness.*
-*A sample image of the avatar expressing sadness.*
-*A screenshot of the Misomia app interface.*
-
 ---
 
 **Note:** Image generation can take several seconds depending on the API service and model.
