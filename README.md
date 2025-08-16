@@ -47,9 +47,9 @@ Type your messages in the chat input. The avatar will detect your emotion, gener
 ## Sample Images
 
 <p align="center">
-  <img src="docs/images/happy_avatar.png" width="300" alt="Happy Avatar Example" style="display: inline-block; margin: 0 10px;">
-  <img src="docs/images/sad_avatar.png" width="300" alt="Sad Avatar Example" style="display: inline-block; margin: 0 10px;">
-  <img src="docs/images/app_screenshot.png" width="300" alt="App Screenshot" style="display: inline-block; margin: 0 10px;">
+  <img src="docs/images/app_screenshot1.png" width="300" alt="Screen shot Example1" style="display: inline-block; margin: 0 10px;">
+  <img src="docs/images/app_screenshot2.png" width="300" alt="Screen shot Example2" style="display: inline-block; margin: 0 10px;">
+  <img src="docs/images/app_screenshot3.png" width="300" alt="Screen shot Example3" style="display: inline-block; margin: 0 10px;">
 </p>
 
 ---
