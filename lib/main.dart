@@ -92,15 +92,16 @@ class _ChatScreenState extends State<ChatScreen> {
       drawer: ImagePromptDrawer(controller: _imagePromptController), // Added Drawer
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // Wrapped with SingleChildScrollView
-          child: Column(
-            children: [
-              // Fixed AvatarView at the top
-              AvatarView(emotion: lastEmotion, imagePrompt: _imagePromptController.text.isEmpty ? null : _imagePromptController.text),
-              const SizedBox(height: 20),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            // Flexible AvatarView at the top
+            Flexible(
+              child: AvatarView(emotion: lastEmotion, imagePrompt: _imagePromptController.text.isEmpty ? null : _imagePromptController.text),
+            ),
+            const SizedBox(height: 20),
+            // Scrollable chat history
+            Expanded(
+              child: ListView.builder(
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
                   final message = _messages[index];
@@ -113,30 +114,31 @@ class _ChatScreenState extends State<ChatScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _textController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type your message...',
-                        border: OutlineInputBorder(),
-                      ),
-                      onSubmitted: (_) => _analyzeTextMessage(),
+            ),
+            const SizedBox(height: 20),
+            // Fixed chat input at the bottom
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _textController,
+                    decoration: const InputDecoration(
+                      hintText: 'Type your message...',
+                      border: OutlineInputBorder(),
                     ),
+                    onSubmitted: (_) => _analyzeTextMessage(),
                   ),
-                  const SizedBox(width: 8),
-                  _isLoading
-                      ? const CircularProgressIndicator()
-                      : IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: _analyzeTextMessage,
-                        ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                const SizedBox(width: 8),
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : IconButton(
+                        icon: const Icon(Icons.send),
+                        onPressed: _analyzeTextMessage,
+                      ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -230,23 +232,29 @@ class _AvatarViewState extends State<AvatarView> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final availableHeight = MediaQuery.of(context).size.height - kToolbarHeight - kBottomNavigationBarHeight - keyboardHeight; // Approximate available height
     final imageWidth = screenWidth > 600 ? 600.0 : screenWidth; // Max width of 600 for larger screens
+    final imageHeight = availableHeight * 0.4; // Take 40% of available height, adjust as needed
 
     if (_isLoadingImage) {
       return SizedBox(
         width: imageWidth,
+        height: imageHeight,
         child: const Center(child: CircularProgressIndicator()),
       );
     } else if (_imageData != null) {
       return Image.memory(
         _imageData!,
         width: imageWidth,
-        fit: BoxFit.fitWidth,
+        height: imageHeight,
+        fit: BoxFit.contain,
       );
     } else {
       // Fallback if image generation fails
       return SizedBox(
         width: imageWidth,
+        height: imageHeight,
         child: const Center(child: Icon(Icons.broken_image, size: 50)),
       );
     }

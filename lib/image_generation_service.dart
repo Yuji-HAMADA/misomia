@@ -12,7 +12,9 @@ class ImageGenerationService {
 
     final prompt = customPrompt != null && customPrompt.isNotEmpty
         ? "$customPrompt, feeling ${emotion.name}"
-        : "anime girl, bust-up, short dark hair, pastel colored T-shirt, clean line art, flat colors, cel-shading, expressive eyes, simple lighting, Japanese anime style, feeling ${emotion.name}";
+        : """anime girl, bust-up, short dark hair, pastel colored T-shirt,
+          clean line art, flat colors, cel-shading, expressive eyes, simple lighting,
+          Japanese anime style, feeling ${emotion.name}""";
 
     final negativePromptString = "realistic, photo, 3D render, painterly, dramatic lighting, shadows, sketch";
 
