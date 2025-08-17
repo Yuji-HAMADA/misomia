@@ -50,6 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ReplyService _replyService = ReplyService();
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _imagePromptController = TextEditingController();
+  final TextEditingController _negativePromptController = TextEditingController(); // New controller
   final List<ChatMessage> _messages = [];
   bool _isLoading = false;
 
@@ -57,8 +58,12 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _loadPrompt();
+    _loadNegativePrompt(); // Load negative prompt
     _imagePromptController.addListener(() {
       _savePrompt(_imagePromptController.text);
+    });
+    _negativePromptController.addListener(() {
+      _saveNegativePrompt(_negativePromptController.text);
     });
   }
 
@@ -67,7 +72,11 @@ class _ChatScreenState extends State<ChatScreen> {
     _imagePromptController.removeListener(() {
       _savePrompt(_imagePromptController.text);
     });
+    _negativePromptController.removeListener(() {
+      _saveNegativePrompt(_negativePromptController.text);
+    });
     _imagePromptController.dispose();
+    _negativePromptController.dispose(); // Dispose negative prompt controller
     _textController.dispose();
     super.dispose();
   }
@@ -85,6 +94,21 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _savePrompt(String prompt) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('imagePrompt', prompt);
+  }
+
+  Future<void> _loadNegativePrompt() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedNegativePrompt = prefs.getString('negativePrompt');
+    if (savedNegativePrompt != null) {
+      setState(() {
+        _negativePromptController.text = savedNegativePrompt;
+      });
+    }
+  }
+
+  Future<void> _saveNegativePrompt(String prompt) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('negativePrompt', prompt);
   }
 
   void _analyzeTextMessage() async {
@@ -124,13 +148,20 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: const Text('Misomia'),
       ),
-      drawer: ImagePromptDrawer(controller: _imagePromptController),
+      drawer: ImagePromptDrawer(
+        imagePromptController: _imagePromptController,
+        negativePromptController: _negativePromptController,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Flexible(
-              child: AvatarView(emotion: lastEmotion, imagePrompt: _imagePromptController.text.isEmpty ? null : _imagePromptController.text),
+              child: AvatarView(
+                emotion: lastEmotion,
+                imagePrompt: _imagePromptController.text.isEmpty ? null : _imagePromptController.text,
+                negativePrompt: _negativePromptController.text.isEmpty ? null : _negativePromptController.text,
+              ),
             ),
             const SizedBox(height: 20),
             Expanded(
@@ -178,9 +209,14 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class ImagePromptDrawer extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController imagePromptController;
+  final TextEditingController negativePromptController;
 
-  const ImagePromptDrawer({super.key, required this.controller});
+  const ImagePromptDrawer({
+    super.key,
+    required this.imagePromptController,
+    required this.negativePromptController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +229,7 @@ class ImagePromptDrawer extends StatelessWidget {
               color: Colors.deepPurple,
             ),
             child: Text(
-              'Image Prompt',
+              'Image Prompts',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -202,13 +238,28 @@ class ImagePromptDrawer extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: 'Enter image prompt (e.g., "anime girl with blue hair")',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
+            child: Column(
+              children: [
+                TextField(
+                  controller: imagePromptController,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter positive prompt (e.g., "anime girl with blue hair")',
+                    border: OutlineInputBorder(),
+                    labelText: 'Positive Prompt',
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: negativePromptController,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter negative prompt (e.g., "realistic, photo")',
+                    border: OutlineInputBorder(),
+                    labelText: 'Negative Prompt',
+                  ),
+                  maxLines: 3,
+                ),
+              ],
             ),
           ),
         ],
@@ -219,9 +270,15 @@ class ImagePromptDrawer extends StatelessWidget {
 
 class AvatarView extends StatefulWidget {
   final Emotion emotion;
-  final String? imagePrompt; // New parameter
+  final String? imagePrompt;
+  final String? negativePrompt;
 
-  const AvatarView({super.key, required this.emotion, this.imagePrompt});
+  const AvatarView({
+    super.key,
+    required this.emotion,
+    this.imagePrompt,
+    this.negativePrompt,
+  });
 
   @override
   State<AvatarView> createState() => _AvatarViewState();
@@ -235,25 +292,26 @@ class _AvatarViewState extends State<AvatarView> {
   @override
   void initState() {
     super.initState();
-    _generateImage(widget.emotion, widget.imagePrompt);
+    _generateImage(widget.emotion, widget.imagePrompt, widget.negativePrompt);
   }
 
   @override
   void didUpdateWidget(covariant AvatarView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.emotion != oldWidget.emotion || widget.imagePrompt != oldWidget.imagePrompt) {
-      _generateImage(widget.emotion, widget.imagePrompt);
+    if (widget.emotion != oldWidget.emotion ||
+        widget.imagePrompt != oldWidget.imagePrompt ||
+        widget.negativePrompt != oldWidget.negativePrompt) {
+      _generateImage(widget.emotion, widget.imagePrompt, widget.negativePrompt);
     }
   }
 
-  void _generateImage(Emotion emotion, String? imagePrompt) async {
+  void _generateImage(Emotion emotion, String? imagePrompt, String? negativePrompt) async {
     setState(() {
       _isLoadingImage = true;
-      _imageData = null; // Clear previous image
-    
+      _imageData = null;
     });
 
-    final imageData = await _imageGenerationService.generateAnimeImage(emotion, imagePrompt);
+    final imageData = await _imageGenerationService.generateAnimeImage(emotion, imagePrompt, negativePrompt);
 
     setState(() {
       _imageData = imageData;
@@ -265,9 +323,9 @@ class _AvatarViewState extends State<AvatarView> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    final availableHeight = MediaQuery.of(context).size.height - kToolbarHeight - kBottomNavigationBarHeight - keyboardHeight; // Approximate available height
-    final imageWidth = screenWidth > 600 ? 600.0 : screenWidth; // Max width of 600 for larger screens
-    final imageHeight = availableHeight * 0.4; // Take 40% of available height, adjust as needed
+    final availableHeight = MediaQuery.of(context).size.height - kToolbarHeight - kBottomNavigationBarHeight - keyboardHeight;
+    final imageWidth = screenWidth > 600 ? 600.0 : screenWidth;
+    final imageHeight = availableHeight * 0.4;
 
     if (_isLoadingImage) {
       return SizedBox(
@@ -283,7 +341,6 @@ class _AvatarViewState extends State<AvatarView> {
         fit: BoxFit.contain,
       );
     } else {
-      // Fallback if image generation fails
       return SizedBox(
         width: imageWidth,
         height: imageHeight,

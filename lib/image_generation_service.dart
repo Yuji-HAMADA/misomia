@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart'; // For debugPrint
 class ImageGenerationService {
   // No API key needed here, as it's handled by the Cloud Function.
 
-  Future<Uint8List?> generateAnimeImage(Emotion emotion, String? customPrompt) async {
+  Future<Uint8List?> generateAnimeImage(Emotion emotion, String? customPrompt, String? negativePrompt) async {
     // The API call is commented out by default.
 //    return null; // Returning null to prevent errors until enabled.
 
@@ -16,7 +16,9 @@ class ImageGenerationService {
           clean line art, flat colors, cel-shading, expressive eyes, simple lighting,
           Japanese anime style, feeling ${emotion.name}""";
 
-    final negativePromptString = "realistic, photo, 3D render, painterly, dramatic lighting, shadows, sketch";
+    final negativePromptString = negativePrompt != null && negativePrompt.isNotEmpty
+        ? negativePrompt
+        : "realistic, photo, 3D render, painterly, dramatic lighting, shadows, sketch";
 
     final url = Uri.parse('https://us-central1-misomia.cloudfunctions.net/getHuggingFaceImage');
 
