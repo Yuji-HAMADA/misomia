@@ -3,6 +3,7 @@ import 'package:misomia/emotion_service.dart';
 import 'package:misomia/reply_service.dart';
 import 'package:misomia/image_generation_service.dart'; // New import
 import 'package:flutter/foundation.dart'; // For debugPrint
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MisomiaApp());
@@ -48,9 +49,43 @@ class _ChatScreenState extends State<ChatScreen> {
   final EmotionService _emotionService = EmotionService();
   final ReplyService _replyService = ReplyService();
   final TextEditingController _textController = TextEditingController();
-  final TextEditingController _imagePromptController = TextEditingController(); // Correctly defined here
+  final TextEditingController _imagePromptController = TextEditingController();
   final List<ChatMessage> _messages = [];
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrompt();
+    _imagePromptController.addListener(() {
+      _savePrompt(_imagePromptController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _imagePromptController.removeListener(() {
+      _savePrompt(_imagePromptController.text);
+    });
+    _imagePromptController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadPrompt() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedPrompt = prefs.getString('imagePrompt');
+    if (savedPrompt != null) {
+      setState(() {
+        _imagePromptController.text = savedPrompt;
+      });
+    }
+  }
+
+  Future<void> _savePrompt(String prompt) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('imagePrompt', prompt);
+  }
 
   void _analyzeTextMessage() async {
     final text = _textController.text;
@@ -72,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ));
       });
     } catch (e) {
-      debugPrint('Error processing message: $e'); // Changed from print to debugPrint
+      debugPrint('Error processing message: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -89,17 +124,15 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: const Text('Misomia'),
       ),
-      drawer: ImagePromptDrawer(controller: _imagePromptController), // Added Drawer
+      drawer: ImagePromptDrawer(controller: _imagePromptController),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Flexible AvatarView at the top
             Flexible(
               child: AvatarView(emotion: lastEmotion, imagePrompt: _imagePromptController.text.isEmpty ? null : _imagePromptController.text),
             ),
             const SizedBox(height: 20),
-            // Scrollable chat history
             Expanded(
               child: ListView.builder(
                 itemCount: _messages.length,
@@ -116,7 +149,6 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // Fixed chat input at the bottom
             Row(
               children: [
                 Expanded(
